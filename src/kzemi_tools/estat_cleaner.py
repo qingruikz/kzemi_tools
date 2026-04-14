@@ -1,41 +1,38 @@
-"""estat CSV データクリーナー"""
+"""e-Stat データクリーナー"""
 
 import re
 import pandas as pd
 
 
 def _parse_column_name(col: str) -> tuple[str, str]:
-    """Parse '#A011000_総人口【万人】' → ('総人口', '万人').
+    """'#A011000_総人口【万人】' → ('総人口', '万人') に変換する。
 
-    Returns (clean_name, unit). Unit is '' if not found.
+    戻り値: (整形後の列名, 単位)。単位がない場合は空文字。
     """
-    # Remove '#CODE_' prefix
+    # '#CODE_' プレフィックスを除去
     name = re.sub(r"^#[A-Za-z0-9]+_", "", col)
-    # Extract unit from 【...】
+    # 【...】から単位を抽出
     m = re.search(r"【(.+?)】", name)
     unit = m.group(1) if m else ""
-    # Remove unit part
+    # 単位部分を除去
     name = re.sub(r"【.+?】", "", name)
     return name, unit
 
 
-def clean_estat_csv(filepath: str) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Read an estat CSV, clean column names, and extract units.
+def clean_estat_csv(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """e-Stat の DataFrame の列名を整形し、単位を抽出する。
 
-    Returns:
+    引数:
+        df: read_csv 等で読み込んだ e-Stat の DataFrame
+
+    戻り値:
         (parsed_df, units_df)
-        - parsed_df: cleaned DataFrame (without '/項目' column)
-        - units_df: DataFrame with columns ['変数名', '単位']
+        - parsed_df: 列名整形済みの DataFrame（'/項目' 列は除外、'調査年' は整数に変換）
+        - units_df: '変数名' と '単位' の 2 列を持つ DataFrame
     """
-    df = pd.read_csv(
-        filepath,
-        encoding="shift-jis",
-        skiprows=0,
-        na_values=["-", "***"],
-        thousands=",",
-    )
+    df = df.copy()
 
-    # Drop '/項目' column if present
+    # '/項目' 列を除外
     item_cols = [c for c in df.columns if c.strip().startswith("/")]
     df = df.drop(columns=item_cols)
 

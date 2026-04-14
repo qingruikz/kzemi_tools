@@ -15,9 +15,10 @@ pip install git+https://github.com/qingruikz/kzemi_tools.git
 e-Stat からダウンロードした CSV（Shift-JIS）を読み込み、列名の整形と単位の抽出を行います。
 
 ```python
-from kzemi_tools import clean_estat_csv
+from kzemi_tools import read_csv, clean_estat_csv
 
-df, units = clean_estat_csv("FEI_PREF_250703135154.csv")
+raw_df = read_csv("FEI_PREF_250703135154.csv")
+df, units = clean_estat_csv(raw_df)
 
 print(units)
 #   変数名   単位
@@ -32,7 +33,7 @@ print(df.head())
 
 | 引数 | 型 | 説明 |
 |------|----|------|
-| `filepath` | `str` | e-Stat CSV ファイルのパス |
+| `df` | `DataFrame` | `read_csv` 等で読み込んだ e-Stat の DataFrame |
 
 **戻り値** — `(df, units)` のタプル
 
