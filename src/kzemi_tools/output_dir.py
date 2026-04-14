@@ -1,7 +1,7 @@
 """出力フォルダ作成ユーティリティ"""
 
 import os
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 
 def create_output_dir(cwd: str) -> str:
@@ -13,7 +13,8 @@ def create_output_dir(cwd: str) -> str:
     戻り値:
         作成されたフォルダの絶対パス
     """
-    now = datetime.now().strftime("%Y%m%d%H%M")
+    jst = timezone(timedelta(hours=9))
+    now = datetime.now(jst).strftime("%Y年%m月%d日_%H時%M分")
     output_path = os.path.join(cwd, "出力ファイル", now)
     os.makedirs(output_path, exist_ok=True)
     print("出力されるファイルはここに保存：", output_path)
