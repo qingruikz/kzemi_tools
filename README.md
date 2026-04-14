@@ -110,6 +110,25 @@ all_cs = extract_cross_section(df, year=2020)
 
 **戻り値** — `DataFrame`（指定年のクロスセクションデータ）
 
+### `read_csv` — CSV 読み込み
+
+Shift-JIS エンコーディング、欠損値（`"-"`, `"***"`）、桁区切りカンマに対応した設定で CSV を読み込みます。
+
+```python
+from kzemi_tools import read_csv
+
+CWD = "/content/drive/MyDrive/卿瑞"
+parsed_df = read_csv(CWD + "/処理済みデータ/parsed_data.csv")
+```
+
+**引数**
+
+| 引数 | 型 | 説明 |
+|------|----|------|
+| `filepath` | `str` | CSV ファイルのパス |
+
+**戻り値** — `DataFrame`
+
 ## 必要環境
 
 - Python >= 3.10
