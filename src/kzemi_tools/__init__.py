@@ -4,6 +4,7 @@ from .estat_cleaner import clean_estat_csv
 from .output_dir import create_output_dir
 from .data_extract import extract_time_series, extract_cross_section
 from .data_reader import read_csv
+from .visualize import regplot, lineplot, histplot, barplot
 
 __all__ = [
     "clean_estat_csv",
@@ -11,4 +12,8 @@ __all__ = [
     "extract_time_series",
     "extract_cross_section",
     "read_csv",
+    "regplot",
+    "lineplot",
+    "histplot",
+    "barplot",
 ]

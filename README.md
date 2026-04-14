@@ -130,7 +130,67 @@ parsed_df = read_csv(CWD + "/処理済みデータ/parsed_data.csv")
 
 **戻り値** — `DataFrame`
 
+### `regplot` — 散布図（回帰直線付き）
+
+```python
+from kzemi_tools import regplot
+
+regplot(data=region_cs, x="総人口", y="森林面積割合", year=2016, output_dir=output_path)
+```
+
+| 引数 | 型 | 説明 |
+|------|----|------|
+| `data` | `DataFrame` | クロスセクション DataFrame |
+| `x` | `str` | x 軸の変数名 |
+| `y` | `str` | y 軸の変数名 |
+| `year` | `int \| None` | 調査年（タイトル・ファイル名に使用）。省略可 |
+| `output_dir` | `str \| None` | 保存先フォルダのパス。省略時は保存しない |
+
+### `lineplot` — 折れ線グラフ（時系列推移）
+
+```python
+from kzemi_tools import lineplot
+
+lineplot(data=national_ts, y="総人口", output_dir=output_path)
+```
+
+| 引数 | 型 | 説明 |
+|------|----|------|
+| `data` | `DataFrame` | 時系列 DataFrame（`調査年` 列を含む） |
+| `y` | `str` | y 軸の変数名 |
+| `output_dir` | `str \| None` | 保存先フォルダのパス。省略時は保存しない |
+
+### `histplot` — ヒストグラム
+
+```python
+from kzemi_tools import histplot
+
+histplot(data=region_cs, x="森林面積割合", year=2016, output_dir=output_path)
+```
+
+| 引数 | 型 | 説明 |
+|------|----|------|
+| `data` | `DataFrame` | クロスセクション DataFrame |
+| `x` | `str` | x 軸の変数名 |
+| `year` | `int \| None` | 調査年（タイトル・ファイル名に使用）。省略可 |
+| `output_dir` | `str \| None` | 保存先フォルダのパス。省略時は保存しない |
+
+### `barplot` — 棒グラフ（ランキング）
+
+```python
+from kzemi_tools import barplot
+
+barplot(data=region_cs, y="森林面積割合", year=2016, output_dir=output_path)
+```
+
+| 引数 | 型 | 説明 |
+|------|----|------|
+| `data` | `DataFrame` | クロスセクション DataFrame（`地域` 列を含む） |
+| `y` | `str` | y 軸の変数名 |
+| `year` | `int \| None` | 調査年（タイトル・ファイル名に使用）。省略可 |
+| `output_dir` | `str \| None` | 保存先フォルダのパス。省略時は保存しない |
+
 ## 必要環境
 
 - Python >= 3.10
-- pandas
+- pandas, matplotlib, seaborn, japanize-matplotlib
