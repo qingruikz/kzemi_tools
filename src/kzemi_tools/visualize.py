@@ -18,7 +18,9 @@ sns.set(
 )
 
 
-def regplot(data, x: str, y: str, year: int | None = None, output_dir: str | None = None):
+def regplot(
+    data, x: str, y: str, year: int | None = None, output_dir: str | None = None
+):
     """散布図（回帰直線付き）を描画する。
 
     引数:
@@ -30,12 +32,12 @@ def regplot(data, x: str, y: str, year: int | None = None, output_dir: str | Non
     """
     fig, ax = plt.subplots()
     sns.regplot(data=data, x=x, y=y, line_kws={"color": "indianred"}, ax=ax)
-    if year is not None:
-        ax.set_title(f"{year}年における{x}と{y}の散布図")
     plt.tight_layout()
     if output_dir is not None:
         label = f"{year}年における" if year is not None else ""
-        fig.savefig(f"{output_dir}/{label}{x}と{y}の散布図.png", dpi=300, bbox_inches="tight")
+        fig.savefig(
+            f"{output_dir}/{label}{x}と{y}の散布図.png", dpi=300, bbox_inches="tight"
+        )
     plt.show()
 
 
@@ -50,7 +52,6 @@ def lineplot(data, y: str, output_dir: str | None = None):
     fig, ax = plt.subplots()
     sorted_data = data.sort_values(by=["調査年"], ascending=True)
     sns.lineplot(data=sorted_data, x="調査年", y=y, ax=ax)
-    ax.set_title(f"{y}の推移")
     plt.xticks(rotation=90)
     plt.tight_layout()
     if output_dir is not None:
@@ -70,12 +71,12 @@ def histplot(data, x: str, year: int | None = None, output_dir: str | None = Non
     fig, ax = plt.subplots()
     sns.histplot(data=data, x=x, ax=ax)
     ax.set_ylabel("度数")
-    if year is not None:
-        ax.set_title(f"{year}年における{x}のヒストグラム")
     plt.tight_layout()
     if output_dir is not None:
         label = f"{year}年における" if year is not None else ""
-        fig.savefig(f"{output_dir}/{label}{x}のヒストグラム.png", dpi=300, bbox_inches="tight")
+        fig.savefig(
+            f"{output_dir}/{label}{x}のヒストグラム.png", dpi=300, bbox_inches="tight"
+        )
     plt.show()
 
 
@@ -91,11 +92,11 @@ def barplot(data, y: str, year: int | None = None, output_dir: str | None = None
     fig, ax = plt.subplots()
     sorted_data = data.sort_values(by=y, ascending=False)
     sns.barplot(data=sorted_data, x="地域", y=y, errorbar=None, ax=ax)
-    if year is not None:
-        ax.set_title(f"{year}年における{y}のランキング")
     plt.xticks(rotation=90)
     plt.tight_layout()
     if output_dir is not None:
         label = f"{year}年における" if year is not None else ""
-        fig.savefig(f"{output_dir}/{label}{y}のランキング.png", dpi=300, bbox_inches="tight")
+        fig.savefig(
+            f"{output_dir}/{label}{y}のランキング.png", dpi=300, bbox_inches="tight"
+        )
     plt.show()
