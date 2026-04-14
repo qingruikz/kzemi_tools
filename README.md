@@ -60,6 +60,56 @@ output_path = create_output_dir("/content/drive/MyDrive/卿瑞")
 
 **戻り値** — `str`（作成されたフォルダの絶対パス）
 
+### `extract_time_series` — 時系列データの抽出
+
+指定した地域の時系列データを抽出します。
+
+```python
+from kzemi_tools import extract_time_series
+
+# 全国の時系列データ
+national_ts = extract_time_series(df, "全国")
+
+# 特定の都道府県・市区町村でも可
+sapporo_ts = extract_time_series(df, "北海道 札幌市")
+```
+
+**引数**
+
+| 引数 | 型 | 説明 |
+|------|----|------|
+| `df` | `DataFrame` | `clean_estat_csv` で取得した DataFrame |
+| `region` | `str` | 抽出対象の地域名（例: `"全国"`, `"北海道"`, `"北海道 紋別市"`） |
+
+**戻り値** — `DataFrame`（指定地域の時系列データ）
+
+### `extract_cross_section` — クロスセクションデータの抽出
+
+指定した年の横断面データを抽出します。欠損値は後方補完（bfill）で埋めます。
+
+```python
+from kzemi_tools import extract_cross_section
+
+# 2016年の都道府県データ（「全国」を除外）
+region_cs = extract_cross_section(df, year=2016, exclude="全国")
+
+# 2018年の市区町村データ（「北海道」を除外）
+city_cs = extract_cross_section(df, year=2018, exclude="北海道")
+
+# 除外なしで全地域を取得
+all_cs = extract_cross_section(df, year=2020)
+```
+
+**引数**
+
+| 引数 | 型 | 説明 |
+|------|----|------|
+| `df` | `DataFrame` | `clean_estat_csv` で取得した DataFrame |
+| `year` | `int` | 調査年（整数、例: `2016`） |
+| `exclude` | `str \| None` | 除外する地域名（例: `"全国"`, `"北海道"`）。省略時は除外なし |
+
+**戻り値** — `DataFrame`（指定年のクロスセクションデータ）
+
 ## 必要環境
 
 - Python >= 3.10
