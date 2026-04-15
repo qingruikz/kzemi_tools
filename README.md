@@ -218,6 +218,31 @@ formulas = print_model_formulas(df_result)
 
 > `generate_model_formulas` は表示なしでリストのみ返します。
 
+### `generate_data_source` — データソース表の生成
+
+記述統計量の変数名と単位情報から、データソース表（変数・単位・出典）を生成します。  
+`総人口の 2 乗` や `総人口の対数` など派生変数は自動的に元の `総人口` に集約されます。
+
+```python
+from kzemi_tools import generate_data_source
+
+data_source = generate_data_source(df_result, units_df, source="e-Stat 社会・人口統計体系")
+#     変数    単位              出典
+# 0   総人口   万人   e-Stat 社会・人口統計体系
+# 1   年平均気温  ﾟC   e-Stat 社会・人口統計体系
+# ...
+```
+
+**引数**
+
+| 引数 | 型 | 説明 |
+|------|----|------|
+| `df_summary` | `DataFrame` | 記述統計量または回帰結果の DataFrame（インデックスが変数名） |
+| `units` | `DataFrame` | `変数名` と `単位` の 2 列を持つ DataFrame |
+| `source` | `str` | 出典（デフォルト: 空文字） |
+
+**戻り値** — `DataFrame`（`変数`, `単位`, `出典` の 3 列）
+
 ## 必要環境
 
 - Python >= 3.10
