@@ -190,6 +190,34 @@ barplot(data=region_cs, y="森林面積割合", year=2016, output_dir=output_pat
 | `year` | `int \| None` | 調査年（タイトル・ファイル名に使用）。省略可 |
 | `output_dir` | `str \| None` | 保存先フォルダのパス。省略時は保存しない |
 
+### `print_model_formulas` / `generate_model_formulas` — 回帰モデル式の生成
+
+回帰分析の結果 DataFrame から、各モデルの識別戦略（モデル式）を自動生成します。
+
+```python
+from kzemi_tools import print_model_formulas
+
+formulas = print_model_formulas(df_result)
+# モデル（1）：財政力指数（都道府県財政） = α + β1 総人口 + 攪乱項
+# モデル（2）：財政力指数（都道府県財政） = α + β1 総人口 + β2 総人口の 2 乗 + 攪乱項
+# モデル（3）：財政力指数（都道府県財政） = α + β1 総人口 + β2 年平均気温 + 攪乱項
+# ...
+```
+
+`df_result` の形式:
+- **列名**: `"（1）\n被説明変数名"` のように、モデル番号と被説明変数名を `\n` で区切る
+- **インデックス**: 説明変数名（空行あり）、`定数項` 以降は統計量（`決定係数` 等）
+
+**引数**
+
+| 引数 | 型 | 説明 |
+|------|----|------|
+| `df_result` | `DataFrame` | 回帰分析の結果 DataFrame |
+
+**戻り値** — `list[str]`（モデル式の文字列リスト）
+
+> `generate_model_formulas` は表示なしでリストのみ返します。
+
 ## 必要環境
 
 - Python >= 3.10
