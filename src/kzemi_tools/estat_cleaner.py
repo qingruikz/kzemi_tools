@@ -5,12 +5,13 @@ import pandas as pd
 
 
 def _parse_column_name(col: str) -> tuple[str, str]:
-    """'#A011000_総人口【万人】' → ('総人口', '万人') に変換する。
+    """'#A011000_総人口【万人】' または 'A011000_総人口【万人】' を
+    ('総人口', '万人') に変換する。
 
     戻り値: (整形後の列名, 単位)。単位がない場合は空文字。
     """
-    # '#CODE_' プレフィックスを除去
-    name = re.sub(r"^#[A-Za-z0-9]+_", "", col)
+    # 先頭の「#」が省略可能な 'CODE_' プレフィックスを除去
+    name = re.sub(r"^#?[A-Za-z0-9]+_", "", col)
     # 【...】から単位を抽出
     m = re.search(r"【(.+?)】", name)
     unit = m.group(1) if m else ""
@@ -36,11 +37,11 @@ def clean_estat_csv(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     item_cols = [c for c in df.columns if c.strip().startswith("/")]
     df = df.drop(columns=item_cols)
 
-    # Rename data columns and collect units
+    # データ列の列名を整形し、単位を収集
     rename_map = {}
     units_records = []
     for col in df.columns:
-        if col.startswith("#"):
+        if re.match(r"^#?[A-Za-z0-9]+_", col):
             clean_name, unit = _parse_column_name(col)
             rename_map[col] = clean_name
             units_records.append({"変数名": clean_name, "単位": unit})
