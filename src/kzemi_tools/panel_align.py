@@ -29,6 +29,13 @@ def _validate(
     if missing_vars:
         raise ValueError(f"変数 {missing_vars} が DataFrame にありません。")
 
+    key_vars = [c for c in columns if c in (id_col, year_col)]
+    if key_vars:
+        raise ValueError(
+            f"{key_vars} はパネルのキー列（id_col / year_col）です。"
+            f"滞後・先行変数は作成できません。"
+        )
+
     for col, k in columns.items():
         # bool は int のサブクラスなので明示的に除外する
         if isinstance(k, bool) or not isinstance(k, int) or k <= 0:
@@ -70,6 +77,7 @@ def _shift_years(
     suffix: str,
     id_col: str,
     year_col: str,
+    drop_original: bool,
 ) -> pd.DataFrame:
     """columns で指定した変数を sign * k 年ずらした列を追加する。
 
@@ -97,6 +105,10 @@ def _shift_years(
         src = src.rename(columns=new_names)
         out = out.merge(src, on=[id_col, year_col], how="left")
 
+    # 結合元は df なので、すべての結合が終わった後に安全に削除できる
+    if drop_original:
+        out = out.drop(columns=list(columns))
+
     return out.sort_values(by=[id_col, year_col], ascending=False).reset_index(
         drop=True
     )
@@ -107,6 +119,7 @@ def make_lag(
     columns: dict[str, int],
     id_col: str = "地域",
     year_col: str = "調査年",
+    drop_original: bool = False,
 ) -> pd.DataFrame:
     """指定した変数の「k 年前」の値を列として追加する。
 
@@ -118,6 +131,8 @@ def make_lag(
         columns: {変数名: 年数} の辞書（例: {"総人口": 3, "県内総生産": 5}）
         id_col: 個体を識別する列名（デフォルト: "地域"）
         year_col: 年を表す列名（整数、デフォルト: "調査年"）
+        drop_original: True にすると、滞後変数の作成元になった列を削除する
+                       （デフォルト: False）
 
     戻り値:
         滞後変数の列を追加した DataFrame。
@@ -127,8 +142,11 @@ def make_lag(
     例:
         >>> panel = make_lag(df, columns={"総人口": 3, "県内総生産": 5})
         >>> # 「総人口（3年前）」「県内総生産（5年前）」列が追加される
+
+        >>> panel = make_lag(df, columns={"総人口": 3}, drop_original=True)
+        >>> # 「総人口（3年前）」が追加され、「総人口」は削除される
     """
-    return _shift_years(df, columns, 1, "年前", id_col, year_col)
+    return _shift_years(df, columns, 1, "年前", id_col, year_col, drop_original)
 
 
 def make_lead(
@@ -136,6 +154,7 @@ def make_lead(
     columns: dict[str, int],
     id_col: str = "地域",
     year_col: str = "調査年",
+    drop_original: bool = False,
 ) -> pd.DataFrame:
     """指定した変数の「k 年後」の値を列として追加する。
 
@@ -151,6 +170,8 @@ def make_lead(
         columns: {変数名: 年数} の辞書（例: {"県内総生産": 5}）
         id_col: 個体を識別する列名（デフォルト: "地域"）
         year_col: 年を表す列名（整数、デフォルト: "調査年"）
+        drop_original: True にすると、先行変数の作成元になった列を削除する
+                       （デフォルト: False）
 
     戻り値:
         先行変数の列を追加した DataFrame。
@@ -160,5 +181,8 @@ def make_lead(
     例:
         >>> panel = make_lead(df, columns={"県内総生産": 5})
         >>> # 「県内総生産（5年後）」列が追加される
+
+        >>> panel = make_lead(df, columns={"県内総生産": 5}, drop_original=True)
+        >>> # 「県内総生産（5年後）」が追加され、「県内総生産」は削除される
     """
-    return _shift_years(df, columns, -1, "年後", id_col, year_col)
+    return _shift_years(df, columns, -1, "年後", id_col, year_col, drop_original)

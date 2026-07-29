@@ -133,6 +133,10 @@ panel = make_lag(df, columns={"総人口": 3, "県内総生産": 5})
 # 5 年後の県内総生産を追加
 panel = make_lead(df, columns={"県内総生産": 5})
 # → 「県内総生産（5年後）」列が追加される
+
+# drop_original=True で、作成元の列を削除する
+panel = make_lag(df, columns={"総人口": 3}, drop_original=True)
+# → 「総人口（3年前）」が追加され、「総人口」は削除される
 ```
 
 追加された列はそのまま可視化・回帰分析に使えます。
@@ -149,6 +153,7 @@ regplot(data=extract_cross_section(panel, 2025), x="総人口（3年前）", y="
 | `columns` | `dict[str, int]` | `{変数名: 年数}` の辞書（例: `{"総人口": 3, "県内総生産": 5}`） |
 | `id_col` | `str` | 個体を識別する列名（デフォルト: `"地域"`） |
 | `year_col` | `str` | 年を表す列名（整数、デフォルト: `"調査年"`） |
+| `drop_original` | `bool` | `True` で作成元の列を削除（デフォルト: `False`） |
 
 **戻り値** — `DataFrame`（元の列 + 滞後・先行変数の列。`地域`・`調査年` の降順に並べ替え）
 
