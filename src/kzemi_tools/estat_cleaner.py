@@ -3,6 +3,8 @@
 import re
 import pandas as pd
 
+ESTAT_SOURCE = "eStat「都道府県・市区町村のすがた(社会・人口統計体系)」データベース"
+
 
 def _parse_column_name(col: str) -> tuple[str, str]:
     """'#A011000_総人口【万人】' または 'A011000_総人口【万人】' を
@@ -28,8 +30,9 @@ def clean_estat_csv(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
 
     戻り値:
         (parsed_df, units_df)
-        - parsed_df: 列名整形済みの DataFrame（'/項目' 列は除外、'調査年' は整数に変換）
-        - units_df: '変数名' と '単位' の 2 列を持つ DataFrame
+        - parsed_df: 列名整形済みの DataFrame（'/項目' 列は除外、'調査年' は整数に変換、
+          '地域'・'調査年' の降順で並べ替え）
+        - units_df: '変数名'・'単位'・'出典' の 3 列を持つ DataFrame
     """
     df = df.copy()
 
@@ -44,7 +47,9 @@ def clean_estat_csv(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
         if re.match(r"^#?[A-Za-z0-9]+_", col):
             clean_name, unit = _parse_column_name(col)
             rename_map[col] = clean_name
-            units_records.append({"変数名": clean_name, "単位": unit})
+            units_records.append(
+                {"変数名": clean_name, "単位": unit, "出典": ESTAT_SOURCE}
+            )
 
     parsed_df = df.rename(columns=rename_map)
 
@@ -52,6 +57,12 @@ def clean_estat_csv(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     if "調査年" in parsed_df.columns:
         parsed_df["調査年"] = parsed_df["調査年"].str.extract(r"(\d+)").astype(int)
 
-    units_df = pd.DataFrame(units_records)
+    sort_cols = [c for c in ("地域", "調査年") if c in parsed_df.columns]
+    if sort_cols:
+        parsed_df = parsed_df.sort_values(by=sort_cols, ascending=False).reset_index(
+            drop=True
+        )
+
+    units_df = pd.DataFrame(units_records, columns=["変数名", "単位", "出典"])
 
     return parsed_df, units_df

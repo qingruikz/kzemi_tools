@@ -26,7 +26,7 @@ def extract_cross_section(
 ) -> pd.DataFrame:
     """指定した年のクロスセクション（横断面）データを抽出する。
 
-    欠損値は後方補完（bfill）で埋めた上で抽出する。
+    欠損値の補完は行わない（欠損はそのまま欠損として残す）。
 
     引数:
         df: clean_estat_csv で取得した DataFrame
@@ -37,11 +37,10 @@ def extract_cross_section(
     戻り値:
         指定年のクロスセクション DataFrame
     """
-    filled = df.bfill()
     if exclude is not None:
-        result = filled.query("地域 != @exclude and 調査年 == @year")
+        result = df.query("地域 != @exclude and 調査年 == @year")
     else:
-        result = filled.query("調査年 == @year")
+        result = df.query("調査年 == @year")
     if result.empty:
         print(f"警告: 調査年={year} に該当するデータが見つかりません。")
     return result
