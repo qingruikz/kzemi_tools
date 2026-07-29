@@ -1,6 +1,38 @@
-"""データ抽出ユーティリティ — 時系列・クロスセクションデータの抽出"""
+"""データ抽出ユーティリティ — パネル・時系列・クロスセクションデータの抽出"""
 
 import pandas as pd
+
+
+def extract_panel(df: pd.DataFrame, exclude: str | None = None) -> pd.DataFrame:
+    """パネルデータ（全地域・全年）を抽出する。
+
+    地域の合計行（「全国」など）を除いた分析用のパネルを作るのに使う。
+    欠損値の補完は行わない（欠損はそのまま欠損として残す）。
+
+    引数:
+        df: clean_estat_csv で取得した DataFrame
+        exclude: 除外する地域名（例: "全国", "北海道"）。
+                 その地域の全ての年の行が除外される。省略時は除外なし。
+
+    戻り値:
+        パネル DataFrame
+
+    例:
+        >>> panel = extract_panel(df, exclude="全国")
+        >>> # 「全国」の行を除いた 都道府県 × 調査年 のパネル
+    """
+    if exclude is None:
+        result = df.copy()
+    else:
+        if exclude not in df["地域"].values:
+            print(
+                f"警告: 「{exclude}」に該当するデータが見つかりません"
+                f"（除外されていません）。"
+            )
+        result = df.query("地域 != @exclude")
+    if result.empty:
+        print("警告: 抽出結果が空です。")
+    return result
 
 
 def extract_time_series(df: pd.DataFrame, region: str) -> pd.DataFrame:

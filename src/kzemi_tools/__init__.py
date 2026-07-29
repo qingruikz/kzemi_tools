@@ -2,7 +2,7 @@
 
 from .estat_cleaner import clean_estat_csv
 from .output_dir import create_output_dir
-from .data_extract import extract_time_series, extract_cross_section
+from .data_extract import extract_panel, extract_time_series, extract_cross_section
 from .data_reader import read_csv, to_csv
 from .panel_align import make_lag, make_lead
 from .visualize import regplot, lineplot, histplot, barplot
@@ -12,6 +12,7 @@ from .data_source import generate_data_source
 __all__ = [
     "clean_estat_csv",
     "create_output_dir",
+    "extract_panel",
     "extract_time_series",
     "extract_cross_section",
     "read_csv",

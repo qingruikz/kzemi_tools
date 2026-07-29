@@ -28,7 +28,7 @@ All public functions are re-exported from `__init__.py`. Each module is self-con
 1. `data_reader.read_csv` → raw DataFrame (encoding auto-detected, missing values, thousands separator handled). `data_reader.to_csv` saves back out (UTF-8 with BOM by default)
 2. `estat_cleaner.clean_estat_csv` → cleaned DataFrame + units DataFrame
 3. `panel_align.make_lag` / `make_lead` → panel DataFrame + lag/lead columns ("総人口（3年前）")
-4. `data_extract.extract_time_series` / `extract_cross_section` → subset DataFrames
+4. `data_extract.extract_panel` / `extract_time_series` / `extract_cross_section` → subset DataFrames
 5. `visualize.regplot/lineplot/histplot/barplot` → plots (display + optional PNG save)
 6. `output_dir.create_output_dir` → timestamped output folder (JST timezone)
 7. `model_formula.print_model_formulas` → regression model formulas from result table
