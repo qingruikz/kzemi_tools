@@ -81,7 +81,7 @@ def to_csv(
     df: pd.DataFrame,
     filepath: str,
     encoding: str = "utf-8-sig",
-) -> str:
+) -> None:
     """DataFrame を CSV ファイルに保存する。
 
     インデックスは書き出さない（index=False）。
@@ -96,13 +96,9 @@ def to_csv(
         filepath: 保存先のパス（例: CWD + '/処理済みデータ/parsed_data.csv'）
         encoding: エンコーディング（デフォルト: "utf-8-sig"）。
                   Shift-JIS で保存したい場合は "shift_jis" を指定する。
-
-    戻り値:
-        保存したファイルのパス
     """
     parent = os.path.dirname(filepath)
     if parent:
         os.makedirs(parent, exist_ok=True)
     df.to_csv(filepath, encoding=encoding, index=False)
     print("保存しました：", filepath)
-    return filepath

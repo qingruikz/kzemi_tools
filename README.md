@@ -206,7 +206,7 @@ to_csv(parsed_df, CWD + "/処理済みデータ/parsed_data.csv", encoding="shif
 | `filepath` | `str`       | 保存先のパス                                    |
 | `encoding` | `str`       | エンコーディング（デフォルト: `"utf-8-sig"`）   |
 
-**戻り値** — `str`（保存したファイルのパス）
+**戻り値** — なし（保存先のパスを表示します）
 
 > デフォルトの `"utf-8-sig"` は BOM 付き UTF-8 です。BOM があることで Excel が文字コードを正しく認識するため、ダブルクリックしても文字化けしません。BOM なしの `"utf-8"`（pandas の `df.to_csv` のデフォルト）だと Excel で文字化けするので注意してください。
 
