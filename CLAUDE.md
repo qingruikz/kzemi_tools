@@ -25,7 +25,7 @@ No test suite or linter is configured. Manual testing is done via `examples/test
 All public functions are re-exported from `__init__.py`. Each module is self-contained with no cross-module dependencies (except `visualize.py` which triggers matplotlib/seaborn setup at import time).
 
 **Data pipeline flow:**
-1. `data_reader.read_csv` → raw DataFrame (Shift-JIS, missing values, thousands separator handled)
+1. `data_reader.read_csv` → raw DataFrame (encoding auto-detected, missing values, thousands separator handled). `data_reader.to_csv` saves back out (UTF-8 with BOM by default)
 2. `estat_cleaner.clean_estat_csv` → cleaned DataFrame + units DataFrame
 3. `panel_align.make_lag` / `make_lead` → panel DataFrame + lag/lead columns ("総人口（3年前）")
 4. `data_extract.extract_time_series` / `extract_cross_section` → subset DataFrames
@@ -36,6 +36,8 @@ All public functions are re-exported from `__init__.py`. Each module is self-con
 
 **Key design decisions:**
 - `clean_estat_csv` takes a DataFrame (not a filepath) — decoupled from reading so `read_csv` can be reused independently
+- `read_csv` sniffs bytes (BOM, then UTF-8 validity) before falling back to `cp932`, rather than trying encodings in order. Trying `cp932` first is unsafe: UTF-8 bytes sometimes decode as valid cp932 without raising, silently producing mojibake (e.g. `'ち'` → `'縺｡'`). `cp932` rather than strict `shift_jis` because it is a superset that also covers NEC/IBM extensions (`①`, `㎡`)
+- `to_csv` defaults to `utf-8-sig`; the BOM is what makes Excel detect UTF-8, so BOM-less `utf-8` would show mojibake for students opening the file by double-click
 - Visualization functions use `plt.show()` for Colab inline display + optional `output_dir` for file saving
 - `create_output_dir` uses JST (UTC+9) hardcoded since students run on Colab (UTC servers)
 - `clean_estat_csv` sorts output by `地域`, `調査年` descending; `panel_align` returns the same order so the two are interchangeable in a pipeline

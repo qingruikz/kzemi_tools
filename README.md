@@ -158,22 +158,57 @@ regplot(data=extract_cross_section(panel, 2025), x="総人口（3年前）", y="
 
 ### `read_csv` — CSV 読み込み
 
-Shift-JIS エンコーディング、欠損値（`"-"`, `"***"`）、桁区切りカンマに対応した設定で CSV を読み込みます。
+欠損値（`"-"`, `"***"`）、桁区切りカンマに対応した設定で CSV を読み込みます。  
+エンコーディングは自動判定されるので、e-Stat からダウンロードした Shift-JIS の CSV でも、`to_csv` で保存した UTF-8 の CSV でもそのまま読めます。
 
 ```python
 from kzemi_tools import read_csv
 
 CWD = "/content/drive/MyDrive/卿瑞"
+
+# e-Stat の生 CSV（Shift-JIS）
+raw_df = read_csv(CWD + "/元データ/FEI_PREF_250703135154.csv")
+
+# to_csv で保存した CSV（UTF-8 BOM 付き）
 parsed_df = read_csv(CWD + "/処理済みデータ/parsed_data.csv")
 ```
 
 **引数**
 
-| 引数       | 型    | 説明               |
-| ---------- | ----- | ------------------ |
-| `filepath` | `str` | CSV ファイルのパス |
+| 引数       | 型            | 説明                                                                        |
+| ---------- | ------------- | --------------------------------------------------------------------------- |
+| `filepath` | `str`         | CSV ファイルのパス                                                          |
+| `encoding` | `str \| None` | エンコーディングを明示指定する場合に使用。省略時は自動判定（Shift-JIS 優先） |
 
 **戻り値** — `DataFrame`
+
+> 自動判定は「BOM の有無 → UTF-8 として妥当か → Shift-JIS（cp932）」の順に調べます。UTF-8 のファイルを Shift-JIS として読むと例外が出ずに文字化けするだけのことがあるため、先に UTF-8 かどうかを判定しています。
+
+### `to_csv` — CSV 保存
+
+`DataFrame` を CSV に保存します。インデックスは書き出しません。保存先のフォルダが無い場合は自動で作成します。
+
+```python
+from kzemi_tools import to_csv
+
+# デフォルトは UTF-8（BOM 付き）
+to_csv(parsed_df, CWD + "/処理済みデータ/parsed_data.csv")
+
+# Shift-JIS で保存したい場合
+to_csv(parsed_df, CWD + "/処理済みデータ/parsed_data.csv", encoding="shift_jis")
+```
+
+**引数**
+
+| 引数       | 型          | 説明                                            |
+| ---------- | ----------- | ----------------------------------------------- |
+| `df`       | `DataFrame` | 保存する DataFrame                              |
+| `filepath` | `str`       | 保存先のパス                                    |
+| `encoding` | `str`       | エンコーディング（デフォルト: `"utf-8-sig"`）   |
+
+**戻り値** — `str`（保存したファイルのパス）
+
+> デフォルトの `"utf-8-sig"` は BOM 付き UTF-8 です。BOM があることで Excel が文字コードを正しく認識するため、ダブルクリックしても文字化けしません。BOM なしの `"utf-8"`（pandas の `df.to_csv` のデフォルト）だと Excel で文字化けするので注意してください。
 
 ### `regplot` — 散布図（回帰直線付き）
 
