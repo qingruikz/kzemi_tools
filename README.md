@@ -300,14 +300,27 @@ histplot(data=region_cs, x="森林面積割合", year=2016, output_dir=output_pa
 from kzemi_tools import barplot
 
 barplot(data=region_cs, y="森林面積割合", year=2016, output_dir=output_path)
+
+# 上位 10 件だけ表示
+barplot(data=city_cs, y="森林面積割合", top=10)
+
+# 小さい順に並べて下位 20 件を表示
+barplot(data=city_cs, y="森林面積割合", top=20, ascending=True)
+
+# 件数を絞らずすべて表示
+barplot(data=region_cs, y="森林面積割合", top=None)
 ```
 
-| 引数         | 型            | 説明                                          |
-| ------------ | ------------- | --------------------------------------------- |
-| `data`       | `DataFrame`   | クロスセクション DataFrame（`地域` 列を含む） |
-| `y`          | `str`         | y 軸の変数名                                  |
-| `year`       | `int \| None` | 調査年（タイトル・ファイル名に使用）。省略可  |
-| `output_dir` | `str \| None` | 保存先フォルダのパス。省略時は保存しない      |
+| 引数         | 型            | 説明                                                             |
+| ------------ | ------------- | ---------------------------------------------------------------- |
+| `data`       | `DataFrame`   | クロスセクション DataFrame（`地域` 列を含む）                    |
+| `y`          | `str`         | y 軸の変数名                                                     |
+| `year`       | `int \| None` | 調査年（タイトル・ファイル名に使用）。省略可                     |
+| `output_dir` | `str \| None` | 保存先フォルダのパス。省略時は保存しない                         |
+| `top`        | `int \| None` | 表示する件数（デフォルト: `50`）。`None` ですべて表示            |
+| `ascending`  | `bool`        | `True` で昇順（小さい順）。デフォルトは降順（大きい順）          |
+
+> 市区町村データのように件数が多い場合、すべて表示すると軸ラベルが読めなくなるため、デフォルトで `50` 件に制限しています。件数を絞ったときはその旨が表示され、保存ファイル名にも `（上位50件）` のように付きます。
 
 ### `print_model_formulas` / `generate_model_formulas` — 回帰モデル式の生成
 
