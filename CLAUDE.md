@@ -25,6 +25,7 @@ No test suite or linter is configured. Manual testing is done via `examples/test
 All public functions are re-exported from `__init__.py`. Each module is self-contained with no cross-module dependencies (except `visualize.py` which triggers matplotlib/seaborn setup at import time).
 
 **Data pipeline flow:**
+
 1. `data_reader.read_csv` → raw DataFrame (encoding auto-detected, missing values, thousands separator handled). `data_reader.to_csv` saves back out (UTF-8 with BOM by default)
 2. `estat_cleaner.clean_estat_csv` → cleaned DataFrame + units DataFrame
 3. `panel_align.make_lag` / `make_lead` → panel DataFrame + lag/lead columns ("総人口（3年前）")
@@ -32,9 +33,10 @@ All public functions are re-exported from `__init__.py`. Each module is self-con
 5. `visualize.regplot/lineplot/histplot/barplot` → plots (display + optional PNG save)
 6. `output_dir.create_output_dir` → timestamped output folder (JST timezone)
 7. `model_formula.print_model_formulas` → regression model formulas from result table
-8. `data_source.generate_data_source` → data source reference table (deduplicates derived variables like "Xの2乗", "Xの対数", "X（3年前）" → "X", including combinations; one row per variable). Reads 出典 per variable from `units_df["出典"]`; `compact=True` replaces 出典 with a/b/c labels plus a printed note
+8. `data_source.generate_data_source` → `(data_source, df_summary_modified)`. `data_source` is the reference table (deduplicates derived variables like "Xの2乗", "Xの対数", "X（3年前）" → "X", including combinations; one row per variable). Reads 出典 per variable from `units_df["出典"]`; `compact=True` replaces 出典 with a/b/c labels plus a printed note. `df_summary_modified` is the input table with a note row appended below the last row (観測数), text in the first column only: item 1) lists 被説明変数 + units (units omitted when blank or a lone hyphen), items 2)/3) are fixed boilerplate. Returned unchanged when the input has no `（N）\n被説明変数` columns
 
 **Key design decisions:**
+
 - `clean_estat_csv` takes a DataFrame (not a filepath) — decoupled from reading so `read_csv` can be reused independently
 - `read_csv` sniffs bytes (BOM, then UTF-8 validity) before falling back to `cp932`, rather than trying encodings in order. Trying `cp932` first is unsafe: UTF-8 bytes sometimes decode as valid cp932 without raising, silently producing mojibake (e.g. `'ち'` → `'縺｡'`). `cp932` rather than strict `shift_jis` because it is a superset that also covers NEC/IBM extensions (`①`, `㎡`)
 - `to_csv` defaults to `utf-8-sig`; the BOM is what makes Excel detect UTF-8, so BOM-less `utf-8` would show mojibake for students opening the file by double-click
