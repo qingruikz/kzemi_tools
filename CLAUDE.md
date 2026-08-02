@@ -32,7 +32,7 @@ All public functions are re-exported from `__init__.py`. Each module is self-con
 5. `visualize.regplot/lineplot/histplot/barplot` → plots (display + optional PNG save)
 6. `output_dir.create_output_dir` → timestamped output folder (JST timezone)
 7. `model_formula.print_model_formulas` → regression model formulas from result table
-8. `data_source.generate_data_source` → data source reference table (deduplicates derived variables like "Xの2乗", "Xの対数", "X（3年前）" → "X", including combinations; one row per variable). Reads 出典 per variable from `units_df["出典"]`
+8. `data_source.generate_data_source` → data source reference table (deduplicates derived variables like "Xの2乗", "Xの対数", "X（3年前）" → "X", including combinations; one row per variable). Reads 出典 per variable from `units_df["出典"]`; `compact=True` replaces 出典 with a/b/c labels plus a printed note
 
 **Key design decisions:**
 - `clean_estat_csv` takes a DataFrame (not a filepath) — decoupled from reading so `read_csv` can be reused independently
@@ -43,6 +43,7 @@ All public functions are re-exported from `__init__.py`. Each module is self-con
 - `clean_estat_csv` sorts output by `地域`, `調査年` descending; `panel_align` returns the same order so the two are interchangeable in a pipeline
 - `panel_align` shifts values by self-joining on `(id_col, year_col + k)` rather than `groupby().shift(k)` — this is independent of row order (output is descending, where `shift` would reverse the sign) and yields NaN instead of a silently wrong value when a year is missing
 - No interpolation anywhere in the pipeline. Missing values stay missing (`extract_cross_section` used to `bfill()` dataframe-wide, which leaked values across regions)
+- `model_formula.generate_model_formulas` and `data_source._variable_names` each cut the result-table index at `定数項` and skip NaN/blank rows. The rule is duplicated rather than shared because modules are intentionally self-contained — keep the two in sync if the result-table format changes
 - `model_formula` parses column format `"（N）\n被説明変数"` and index structure where rows before `定数項` are explanatory variables, NaN rows are standard errors
 
 ## Conventions
